@@ -1,0 +1,48 @@
+name: Build, Test, and Code Quality
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-test-quality:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x, 18.x]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm test
+
+    - name: Run Code Analysis (Linting)
+      run: npm run lint
+
+    - name: Generate Code Coverage Report
+      run: npm run coverage
+
+    - name: Generate Artifacts
+      run: |
+        # Commands to generate artifacts (e.g., compiled binaries)
+        # Replace this with your actual commands
+
+        # Store artifacts
+        mkdir artifacts
+        cp path/to/compiled/files artifacts/
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: my-artifacts
+        path: artifacts/
